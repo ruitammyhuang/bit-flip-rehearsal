@@ -14,7 +14,7 @@
 
   <main>
     <!-- Start screen: the player picks where to begin -->
-    <section id="start-screen" class="screen">
+    <section id="start-screen" class="screen screen-active">
       <h2>Where would you like to start?</h2>
       <p>Pick the choice that sounds most like you. You can change levels at any time.</p>
       <div class="choice-list">
@@ -34,7 +34,7 @@
     </section>
 
     <!-- Intro screen: short, hands-on lessons about binary -->
-    <section id="intro-screen" class="screen" hidden>
+    <section id="intro-screen" class="screen">
       <h2>What is binary?</h2>
       <p id="intro-text"></p>
       <div id="intro-cards" class="card-row"></div>
@@ -43,7 +43,7 @@
     </section>
 
     <!-- Play screen: the levels -->
-    <section id="play-screen" class="screen" hidden>
+    <section id="play-screen" class="screen">
       <div class="score-bar">
         <p>Score: <span id="score">0</span></p>
         <p>Best streak: <span id="best-streak">0</span></p>
@@ -60,7 +60,7 @@
     </section>
 
     <!-- End screen: points for each level -->
-    <section id="end-screen" class="screen" hidden>
+    <section id="end-screen" class="screen">
       <h2>You finished!</h2>
       <p id="end-summary"></p>
       <button type="button" id="play-again" class="action-button">Play again</button>

@@ -23,3 +23,15 @@
 - [Human] Asked for points in Level 3. Reason: without them it supports learning but is less like a game.
 - [AI] Added a start screen with three starting points, help that gets stronger after each wrong try, the 3/2/1 points scale, and a streak bonus.
 - [AI] Chose colors, system fonts, and card sizes. Put files in the project root. Kept the workshop guide below the new README section.
+
+## Step 2: Cards that flip
+
+**Built:** `js/levels.js` now holds three levels. `js/game.js` draws the cards as buttons, flips them, and shows a running binary line and total. The start buttons open the right level. Screens switch with the `screen-active` class in `css/styles.css`.
+
+**Problems:** The review found three features that were on neither the allowed nor the not-allowed list: `setAttribute`, `classList.contains`, and `event.currentTarget`. I removed an unneeded `card.type` line. `createCard` is 18 lines, which is over the 15-line aim, but it was left whole because it does one job.
+
+**Decisions:**
+- [Human] Added `setAttribute`, `classList.contains`, and `event.currentTarget` to the beginner-code-review allowed list. No reason given.
+- [AI] Cards show "On (1)" and "Off (0)", and the running line reads "Binary 01010 = 10", to link on and off to binary digits.
+- [AI] Chose the target numbers: Level 1 is 5, 2, 7, 0. Level 2 is 9, 16, 12, 21. Level 3 is 13, 31, 6, 26, 19.
+- [AI] Screens show and hide through a CSS class instead of the `hidden` attribute. "I'm new to binary" goes straight to Level 1 until the intro exists.

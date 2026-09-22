@@ -33,9 +33,14 @@ main {
   margin: 0.25rem 0 0;
 }
 
-/* Screens */
+/* Screens: only the screen with screen-active is shown */
 .screen {
+  display: none;
   text-align: center;
+}
+
+.screen-active {
+  display: block;
 }
 
 /* Start screen choices */
@@ -127,6 +132,10 @@ main {
   border: 3px solid #1a1a2e;
   border-radius: 12px;
   cursor: pointer;
+}
+
+.card:hover {
+  border-color: #1f5fbf;
 }
 
 .card-on {
