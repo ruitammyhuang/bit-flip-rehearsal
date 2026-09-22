@@ -34,6 +34,7 @@ const introLessons = [
 // showTotal: true means the running total is shown while playing.
 // feedbackStyle: "full" points to a wrong card, "count" only says too much or too little.
 // useStreak: true means correct first tries in a row earn bonus points.
+// doneText: shown when the level is finished. The last level's doneText appears on the end screen.
 const levels = [
   {
     title: "Level 1: Guided",
@@ -42,7 +43,8 @@ const levels = [
     guided: true,
     showTotal: true,
     feedbackStyle: "full",
-    useStreak: false
+    useStreak: false,
+    doneText: "You worked out every card, one question at a time. In Level 2, you flip the cards yourself."
   },
   {
     title: "Level 2: Helped",
@@ -51,7 +53,8 @@ const levels = [
     guided: false,
     showTotal: true,
     feedbackStyle: "full",
-    useStreak: false
+    useStreak: false,
+    doneText: "You made every number with the running total to help. In Level 3, the total is hidden, and first tries in a row earn bonus points."
   },
   {
     title: "Level 3: On your own",
@@ -60,6 +63,7 @@ const levels = [
     guided: false,
     showTotal: false,
     feedbackStyle: "count",
-    useStreak: true
+    useStreak: true,
+    doneText: "You can now turn any number from 0 to 31 into binary and say why each bit is on or off."
   }
 ];

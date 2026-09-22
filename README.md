@@ -7,7 +7,11 @@ Bit Flip is a browser game that teaches binary place value. Players learn to tur
 - **Intro:** short, hands-on screens that explain what binary is.
 - **Level 1 (Guided):** three cards (4, 2, 1). The game asks about each card in turn: "Is 4 too big?"
 - **Level 2 (Helped):** five cards, with a running total. Help appears only after a wrong try, and it gets stronger each time.
-- **Level 3 (On your own):** five cards, no running total, plus points and a streak.
+- **Level 3 (On your own):** five cards, no running total, and bonus points for correct first tries in a row.
+
+Every level gives points: 3 for a first try, 2 for a second, and 1 for a third. A finished guided round in Level 1 gives 1 point. Players can change levels at any time from the menu at the top of every screen. On narrow screens, the menu folds behind a Levels button.
+
+**Changing the content.** Levels, target numbers, and intro lessons live in `js/levels.js`. Changing target numbers, lesson text, or level settings never requires editing `js/game.js`.
 
 **How to run it.** Double-click `index.html`. It opens in any modern browser, needs no internet connection or server, and can be played with only a keyboard.
 

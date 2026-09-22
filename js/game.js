@@ -3,7 +3,7 @@
  */
 
 // The ids of every screen, so showScreen can hide all but one
-const screenIds = ["start-screen", "intro-screen", "play-screen", "end-screen"];
+const screenIds = ["start-screen", "intro-screen", "play-screen", "level-screen", "end-screen"];
 
 // After this many wrong tries, the game shows the answer and moves on
 const maxWrongTries = 3;
@@ -32,6 +32,14 @@ let wrongTries = 0;
 let guidedCardIndex = 0;
 let stillNeed = 0;
 
+// Points earned in each level, and whether the player has played it, in the same order as levels
+let levelPoints = [];
+let levelPlayed = [];
+
+// Correct first tries in a row, which earn bonus points in levels that use a streak
+let streak = 0;
+let bestStreak = 0;
+
 /**
  * Shows one screen and hides all the others.
  * @param {string} screenId - The id of the screen to show.
@@ -43,6 +51,8 @@ function showScreen(screenId) {
   }
   document.getElementById(screenId).classList.add("screen-active");
   currentScreenId = screenId;
+  updateNav();
+  closeMenu();
 }
 
 /**
@@ -109,7 +119,12 @@ function goToNextLesson() {
 function startLevel(levelIndex) {
   currentLevelIndex = levelIndex;
   targetIndex = 0;
+  // Starting a level again replaces its old points, so the score shows the latest try
+  levelPoints[levelIndex] = 0;
+  levelPlayed[levelIndex] = true;
+  streak = 0;
   document.getElementById("level-title").innerText = levels[levelIndex].title;
+  updateScoreBar();
   showScreen("play-screen");
   startRound();
 }
@@ -438,7 +453,8 @@ function finishGuidedRound(stepText) {
   cards[cards.length - 1].classList.remove("card-current");
   document.getElementById("guided-question").innerText = "";
   showGuidedButtons(false);
-  showFeedback(stepText + "\nDone! " + getSumText() + " In binary, " + getTarget() + " is " + getBinaryText() + ".", "feedback-correct");
+  addPoints(1);
+  showFeedback(stepText + "\nDone! " + getSumText() + " In binary, " + getTarget() + " is " + getBinaryText() + ". +" + getPointsText(1) + ".", "feedback-correct");
   endRound();
 }
 
@@ -462,7 +478,7 @@ function answerFits() {
 function checkAnswer() {
   const sum = getSum();
   if (sum === getTarget()) {
-    showFeedback("Correct! " + getSumText(), "feedback-correct");
+    showFeedback("Correct! " + getSumText() + scoreCorrectAnswer(), "feedback-correct");
     endRound();
   } else {
     wrongTries = wrongTries + 1;
@@ -477,6 +493,9 @@ function checkAnswer() {
 function showWrongFeedback(sum) {
   const feedbackStyle = levels[currentLevelIndex].feedbackStyle;
   if (wrongTries >= maxWrongTries) {
+    // No points this round, and the streak starts over
+    streak = 0;
+    updateScoreBar();
     showAnswer();
     endRound();
   } else if (wrongTries === 2 && feedbackStyle === "full") {
@@ -563,10 +582,241 @@ function goToNext() {
   if (targetIndex < levels[currentLevelIndex].targets.length) {
     startRound();
   } else if (currentLevelIndex + 1 < levels.length) {
-    startLevel(currentLevelIndex + 1);
+    showLevelComplete();
   } else {
-    showScreen("end-screen");
+    showEndScreen();
   }
+}
+
+/**
+ * Writes a number of points with the right word, such as "1 point" or "3 points".
+ * @param {number} points - How many points.
+ * @returns {string} The number and the word point or points.
+ */
+function getPointsText(points) {
+  if (points === 1) {
+    return "1 point";
+  }
+  return points + " points";
+}
+
+/**
+ * Adds points to the current level and updates the score bar.
+ * @param {number} points - How many points to add.
+ */
+function addPoints(points) {
+  levelPoints[currentLevelIndex] = levelPoints[currentLevelIndex] + points;
+  updateScoreBar();
+}
+
+/**
+ * Adds up the points from every level.
+ * @returns {number} The total score.
+ */
+function getTotalScore() {
+  let total = 0;
+  for (let i = 0; i < levelPoints.length; i++) {
+    total = total + levelPoints[i];
+  }
+  return total;
+}
+
+/**
+ * Gives points for a correct answer in free play and says how many were earned.
+ * @returns {string} The points message, such as " +3 points."
+ */
+function scoreCorrectAnswer() {
+  // 3 points on the first try, 2 on the second, 1 on the third
+  const points = maxWrongTries - wrongTries;
+  addPoints(points);
+  let message = " +" + getPointsText(points) + ".";
+  if (levels[currentLevelIndex].useStreak) {
+    message = message + updateStreak(wrongTries === 0);
+  }
+  return message;
+}
+
+/**
+ * Grows the streak after a correct first try, or starts it over, and gives a bonus point for 2 or more in a row.
+ * @param {boolean} firstTry - True if the answer was right on the first try.
+ * @returns {string} A bonus message, or "" if there is no bonus.
+ */
+function updateStreak(firstTry) {
+  if (!firstTry) {
+    streak = 0;
+    updateScoreBar();
+    return "";
+  }
+  streak = streak + 1;
+  if (streak > bestStreak) {
+    bestStreak = streak;
+  }
+  if (streak < 2) {
+    updateScoreBar();
+    return "";
+  }
+  addPoints(1);
+  return " " + streak + " in a row! +1 bonus point.";
+}
+
+/**
+ * Shows the total score and the streak. The streak only shows in levels that use it.
+ */
+function updateScoreBar() {
+  document.getElementById("score").innerText = getTotalScore();
+  document.getElementById("streak").innerText = streak;
+  document.getElementById("best-streak").innerText = bestStreak;
+  let streakDisplay = "none";
+  if (levels[currentLevelIndex].useStreak) {
+    streakDisplay = "";
+  }
+  document.getElementById("streak-display").style.display = streakDisplay;
+}
+
+/**
+ * Sets every level's points to 0 and clears the streak, for a new game.
+ */
+function resetScores() {
+  for (let i = 0; i < levels.length; i++) {
+    levelPoints[i] = 0;
+    levelPlayed[i] = false;
+  }
+  streak = 0;
+  bestStreak = 0;
+}
+
+/**
+ * Shows the level complete screen with the points for the level just finished.
+ */
+function showLevelComplete() {
+  const level = levels[currentLevelIndex];
+  const nextLevelButton = document.getElementById("next-level-button");
+  document.getElementById("level-done-title").innerText = "You finished " + level.title + "!";
+  document.getElementById("level-done-text").innerText = "You earned " + getPointsText(levelPoints[currentLevelIndex]) + ". " + level.doneText;
+  nextLevelButton.innerText = "Go to " + levels[currentLevelIndex + 1].title;
+  showScreen("level-screen");
+  nextLevelButton.focus();
+}
+
+/**
+ * Starts the level after the one just finished.
+ */
+function goToNextLevel() {
+  startLevel(currentLevelIndex + 1);
+}
+
+/**
+ * Starts the level just finished again, from its first target number.
+ */
+function replayLevel() {
+  startLevel(currentLevelIndex);
+}
+
+/**
+ * Shows the end screen with the points for each level the player played.
+ */
+function showEndScreen() {
+  const endList = document.getElementById("end-list");
+  while (endList.children.length > 0) {
+    endList.removeChild(endList.children[0]);
+  }
+  for (let i = 0; i < levels.length; i++) {
+    if (levelPlayed[i]) {
+      const item = document.createElement("li");
+      item.innerText = levels[i].title + ": " + getPointsText(levelPoints[i]);
+      endList.appendChild(item);
+    }
+  }
+  document.getElementById("end-summary").innerText = levels[levels.length - 1].doneText;
+  document.getElementById("end-total").innerText = "Total: " + getPointsText(getTotalScore());
+  showScreen("end-screen");
+  document.getElementById("play-again").focus();
+}
+
+/**
+ * Clears the score and goes back to the start screen.
+ */
+function playAgain() {
+  resetScores();
+  showScreen("start-screen");
+  document.getElementById("start-new").focus();
+}
+
+/**
+ * Adds one button for each level to the level menu in the header.
+ */
+function buildLevelNav() {
+  const levelButtons = document.getElementById("level-buttons");
+  for (let i = 0; i < levels.length; i++) {
+    const button = document.createElement("button");
+    button.classList.add("nav-button");
+    // Short labels keep the menu on one row. Add 1 so levels count from 1, not 0.
+    button.innerText = "Level " + (i + 1);
+    button.addEventListener("click", chooseLevel);
+    levelButtons.appendChild(button);
+  }
+}
+
+/**
+ * Starts the level whose button was pressed in the level menu.
+ * @param {Object} event - The click event from a level button.
+ */
+function chooseLevel(event) {
+  const buttons = document.getElementById("level-buttons").children;
+  for (let i = 0; i < buttons.length; i++) {
+    if (buttons[i] === event.currentTarget) {
+      startLevel(i);
+    }
+  }
+}
+
+/**
+ * Marks the menu button for the screen being played: the intro or one level.
+ */
+function updateNav() {
+  markNavButton(document.getElementById("nav-intro"), currentScreenId === "intro-screen");
+  const buttons = document.getElementById("level-buttons").children;
+  for (let i = 0; i < buttons.length; i++) {
+    markNavButton(buttons[i], currentScreenId === "play-screen" && i === currentLevelIndex);
+  }
+}
+
+/**
+ * Shows one menu button as current or not current.
+ * @param {HTMLElement} button - The menu button to mark.
+ * @param {boolean} isCurrent - True if this button's screen is being played.
+ */
+function markNavButton(button, isCurrent) {
+  if (isCurrent) {
+    button.classList.add("nav-button-current");
+    // aria-current tells screen readers which screen is being played
+    button.setAttribute("aria-current", "true");
+  } else {
+    button.classList.remove("nav-button-current");
+    button.setAttribute("aria-current", "false");
+  }
+}
+
+/**
+ * Opens or closes the level menu on narrow screens.
+ */
+function toggleMenu() {
+  const navList = document.getElementById("nav-list");
+  navList.classList.toggle("nav-list-open");
+  // aria-expanded tells screen readers whether the menu is open
+  if (navList.classList.contains("nav-list-open")) {
+    document.getElementById("menu-button").setAttribute("aria-expanded", "true");
+  } else {
+    document.getElementById("menu-button").setAttribute("aria-expanded", "false");
+  }
+}
+
+/**
+ * Closes the level menu, so it doesn't cover the new screen.
+ */
+function closeMenu() {
+  document.getElementById("nav-list").classList.remove("nav-list-open");
+  document.getElementById("menu-button").setAttribute("aria-expanded", "false");
 }
 
 /**
@@ -598,3 +848,12 @@ document.getElementById("answer-too-big").addEventListener("click", answerTooBig
 document.getElementById("answer-fits").addEventListener("click", answerFits);
 document.getElementById("check-button").addEventListener("click", checkAnswer);
 document.getElementById("next-button").addEventListener("click", goToNext);
+document.getElementById("nav-intro").addEventListener("click", startIntro);
+document.getElementById("menu-button").addEventListener("click", toggleMenu);
+document.getElementById("next-level-button").addEventListener("click", goToNextLevel);
+document.getElementById("replay-level-button").addEventListener("click", replayLevel);
+document.getElementById("play-again").addEventListener("click", playAgain);
+
+// Set up a fresh game when the page loads
+resetScores();
+buildLevelNav();

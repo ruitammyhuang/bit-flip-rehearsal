@@ -57,3 +57,15 @@
 - [Human] Intro messages must follow the cards. Reason: "a learner might keep pressing the cards to play around, yet the hint message does not change."
 - [Human] Made the binary digit the biggest thing on each card. My version had the decimal value large and "On (1)" small. Reason: the goal is to learn binary, yet the decimal numbers were the eye-catching part.
 - [AI] Stored lessons as `{ text, bitValues, target, doneText }` instead of the planned `{ text, task }`. Labeled the answer buttons "Yes, too big" / "No, it fits". A wrong guided answer asks "Is 4 bigger than 5?" instead of giving the answer. Level 1 cards are locked because the game flips them.
+
+## Step 5: Points, progression, and the header menu
+
+**Built:** Points in every level, a Level 3 streak, level-complete and end screens (`js/game.js`, `index.html`), each level's `doneText` in `js/levels.js`, and a level menu in the header with a narrow-screen Levels button (`css/styles.css`). README updated.
+
+**Problems:** You found that the intro had no level menu, and that the menu at the bottom of the play screen moved when switching levels. Both are fixed by moving the menu into the header. A white-on-light hover color on the current-level button was caught and fixed before review. The review found no failures.
+
+**Decisions:**
+- [Human] Show the level menu on the intro too. Reason: there was no way to get back to the levels.
+- [Human] Keep the menu in one fixed place, with a hamburger menu on narrow screens. My version was a row at the bottom of the play screen. Reason: a menu that jumps around is poor UX.
+- [Human] Replaced "Flip the cards. Learn how computers count." with a title and description that state the base-10 to binary skill. Reason: players who skip the intro may not know what they are doing.
+- [AI] Scoring details: +1 bonus from the second first-try-in-a-row, replaying a level replaces its points, and short "Level 1" menu labels. Wrote all the level-complete and end screen wording.

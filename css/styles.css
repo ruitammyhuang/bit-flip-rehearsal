@@ -16,21 +16,90 @@ main {
   padding: 1rem 1.5rem 3rem;
 }
 
-/* Header */
+/* Header: the title, the level menu, and what the game teaches, on every screen */
 .site-header {
-  padding: 1.5rem;
-  text-align: center;
+  padding: 1rem 1.5rem;
   color: #ffffff;
   background-color: #1a1a2e;
 }
 
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .site-header h1 {
   margin: 0;
-  font-size: 2.5rem;
+  font-size: 1.75rem;
 }
 
 .tagline {
-  margin: 0.25rem 0 0;
+  margin: 0.75rem 0 0;
+  font-size: 1.0625rem;
+}
+
+/* Level menu in the header. It stays in the same place on every screen. */
+.site-nav {
+  position: relative;
+}
+
+.nav-list {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-levels {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-button,
+.menu-button {
+  min-width: 88px;
+  min-height: 48px;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: #1a1a2e;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.nav-button:hover,
+.menu-button:hover {
+  background-color: #33335a;
+}
+
+/* The screen being played gets a filled button */
+.nav-button-current {
+  color: #1a1a2e;
+  background-color: #ffffff;
+}
+
+.nav-button-current:hover {
+  background-color: #e8effa;
+}
+
+/* The Levels button only shows on narrow screens */
+.menu-button {
+  display: none;
+}
+
+/* Header buttons sit on a dark background, so their focus ring is white */
+.nav-button:focus-visible,
+.menu-button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
 }
 
 /* Screens: only the screen with screen-active is shown */
@@ -217,6 +286,18 @@ main {
   background-color: #e8effa;
 }
 
+/* End screen summary */
+.end-list {
+  padding: 0;
+  font-size: 1.25rem;
+  list-style: none;
+}
+
+.end-total {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 /* Focus styles: a thick dark ring for keyboard players */
 .choice-button:focus-visible,
 .action-button:focus-visible,
@@ -225,8 +306,40 @@ main {
   outline-offset: 4px;
 }
 
-/* Narrow screens: smaller cards so all five still fit in one row */
+/* Narrow screens: smaller cards so all five still fit in one row,
+   and the level menu folds behind the Levels button */
 @media (max-width: 700px) {
+  .site-header h1 {
+    font-size: 1.375rem;
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  .nav-list {
+    display: none;
+  }
+
+  /* game.js adds nav-list-open when the Levels button is pressed */
+  .nav-list-open {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: #1a1a2e;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+  }
+
+  .nav-levels {
+    flex-direction: column;
+  }
+
   .card {
     width: 88px;
     min-height: 120px;

@@ -3,20 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bit Flip: Learn Binary Place Value</title>
+  <title>Bit Flip: Turn Numbers into Binary</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <header class="site-header">
-    <h1>Bit Flip</h1>
-    <p class="tagline">Flip the cards. Learn how computers count.</p>
+    <div class="header-inner">
+      <div class="header-top">
+        <h1>Bit Flip: Turn Numbers into Binary</h1>
+        <!-- The same menu shows on every screen. On narrow screens it folds behind the Levels button. -->
+        <nav class="site-nav" aria-label="Levels">
+          <button type="button" id="menu-button" class="menu-button" aria-expanded="false" aria-controls="nav-list">
+            <span aria-hidden="true">☰</span> Levels
+          </button>
+          <div id="nav-list" class="nav-list">
+            <button type="button" id="nav-intro" class="nav-button">Intro</button>
+            <!-- game.js adds one button for each level in levels.js -->
+            <div id="level-buttons" class="nav-levels"></div>
+          </div>
+        </nav>
+      </div>
+      <p class="tagline">Practice turning base-10 numbers (the everyday numbers 0 to 31) into binary, the 1s and 0s computers use.
+        Each card is a bit worth 16, 8, 4, 2, or 1. Turn a card on (1) to add its value, or leave it off (0).</p>
+    </div>
   </header>
 
   <main>
     <!-- Start screen: the player picks where to begin -->
     <section id="start-screen" class="screen screen-active">
       <h2>Where would you like to start?</h2>
-      <p>Pick the choice that sounds most like you. You can change levels at any time.</p>
+      <p>Pick the choice that sounds most like you. You can change levels at any time from the menu at the top.</p>
       <div class="choice-list">
         <button type="button" id="start-new" class="choice-button">
           <span class="choice-title">I'm new to binary</span>
@@ -48,7 +64,7 @@
     <section id="play-screen" class="screen">
       <div class="score-bar">
         <p>Score: <span id="score">0</span></p>
-        <p>Best streak: <span id="best-streak">0</span></p>
+        <p id="streak-display">Streak: <span id="streak">0</span> (best: <span id="best-streak">0</span>)</p>
       </div>
       <h2 id="level-title">Level</h2>
       <p id="target-text" class="target"></p>
@@ -64,10 +80,22 @@
       </div>
     </section>
 
+    <!-- Level complete screen: points for the level, then on to the next -->
+    <section id="level-screen" class="screen">
+      <h2 id="level-done-title">Level complete!</h2>
+      <p id="level-done-text"></p>
+      <div class="action-row">
+        <button type="button" id="next-level-button" class="action-button">Next level</button>
+        <button type="button" id="replay-level-button" class="action-button">Play this level again</button>
+      </div>
+    </section>
+
     <!-- End screen: points for each level -->
     <section id="end-screen" class="screen">
       <h2>You finished!</h2>
       <p id="end-summary"></p>
+      <ul id="end-list" class="end-list"></ul>
+      <p id="end-total" class="end-total"></p>
       <button type="button" id="play-again" class="action-button">Play again</button>
     </section>
   </main>
