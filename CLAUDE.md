@@ -10,26 +10,27 @@ The players are adults new to computer science and middle or high school student
 
 ## Constraints
 
-- Plain HTML, CSS, and JavaScript. No frameworks, libraries, build tools, or CDN links.
+- Plain HTML, CSS, and JavaScript. No frameworks, libraries, or build tools.
 - The game opens by double-clicking `index.html`. No server.
 - JavaScript stays at beginner level. A student in their first programming course should be able to read every line.
-- It must work on a laptop screen. Phones are a bonus.
+- It must work on a laptop screen and a tablet screen for broader K-12 learning context compatibility. Mobile phone screen is beyond minimum viable product scope.
 
-## Architecture
+## Project architecture
 
 ```
 bit-flip/
-├── index.html        structure only
-├── css/
-│   └── styles.css    all styling, no inline styles
-├── js/
-│   ├── levels.js     game content: the target numbers
-│   └── game.js       game logic
-├── assets/           images or sounds, only if needed
-└── README.md         what the game teaches and how to run it
++-- index.html      structure only
++-- css/
+|   +-- styles.css  all styling, no inline styles
++-- js/
+│   +-- levels.js   game levels, content within each level
+│   +-- game.js     main game logic and control
++-- assets/         images or sounds, only if needed
++-- README.md       what the game teaches and how to run it
+
 ```
 
-Content stays separate from logic. Changing the target numbers should never require editing `game.js`.
+Content stays separate from logic to modularize the structure, to increase readability and maintainability.
 
 ## Quality criteria (my definition of done)
 
