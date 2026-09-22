@@ -12,6 +12,7 @@ The players are adults new to computer science and middle or high school student
 
 - Plain HTML, CSS, and JavaScript. No frameworks, libraries, or build tools.
 - The game opens by double-clicking `index.html`. No server.
+- Every file the game uses lives in this project folder. Nothing loads from another website: no outside fonts, scripts, or stylesheets.
 - JavaScript stays at beginner level. A student in their first programming course should be able to read every line.
 - It must work on a laptop screen and a tablet screen for broader K-12 learning context compatibility. Mobile phone screen is beyond minimum viable product scope.
 
@@ -23,14 +24,14 @@ bit-flip/
 +-- css/
 |   +-- styles.css  all styling, no inline styles
 +-- js/
-│   +-- levels.js   game levels, content within each level
-│   +-- game.js     main game logic and control
+|   +-- levels.js   game levels, content within each level
+|   +-- game.js     main game logic and control
 +-- assets/         images or sounds, only if needed
 +-- README.md       what the game teaches and how to run it
 
 ```
 
-Content stays separate from logic to modularize the structure, to increase readability and maintainability.
+Content stays separate from logic, so the code is easier to read and maintain. Changing the levels should never require editing game.js.
 
 ## Quality criteria (my definition of done)
 
@@ -39,7 +40,8 @@ Content stays separate from logic to modularize the structure, to increase reada
 3. The HTML is semantic. Clickable things are `<button>` elements, and headings go in order without skipping levels.
 4. Text is readable against its background (WCAG AA contrast).
 5. The browser console shows no errors.
-6. Every function is short enough to read aloud and has a one-line comment above it saying what it does.
+6. Every function is short enough to read aloud and carries a JSDoc comment block.
+7. Cards are big enough to tap with a finger (compatible for tablet).
 
 ## Workflow
 
@@ -49,4 +51,5 @@ Content stays separate from logic to modularize the structure, to increase reada
 
 ## Skills and tools
 
-- Before you tell me a step with JavaScript is done, run the `beginner-js-review` skill on the `js/` folder and fix anything it flags.
+- Before you tell me a step is done, run the `beginner-code-review` skill on the HTML, CSS, and JavaScript, and fix anything it flags.
+- After I approve a step, run the `decision-log` skill before you commit.

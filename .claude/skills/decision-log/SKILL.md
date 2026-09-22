@@ -7,7 +7,7 @@ description: Keep DEVLOG.md, a running record of each build step, the problems t
 
 After each step I approve, and before you commit, add one entry to the end of `DEVLOG.md` in the project root. Commit `DEVLOG.md` together with that step's code.
 
-If `DEVLOG.md` doesn't exist yet, create it with the heading `# Bit Flip decision log`. Then add a Step 0 entry that lists the main decisions in `CLAUDE.md` as [Human] items, one line each, six at most.
+If `DEVLOG.md` doesn't exist yet, create it with the heading `# Bit Flip decision log`. Then add a Step 0 entry listing the decisions in `CLAUDE.md` that will shape the build: the goal, the architecture, the constraints, and the quality criteria. One line each, and group related ones into a single line rather than repeating the brief. Mark them all [Human, before any code].
 
 ## Entry format
 
@@ -17,7 +17,7 @@ If `DEVLOG.md` doesn't exist yet, create it with the heading `# Bit Flip decisio
 **Built:** one or two sentences on what changed. Name the files.
 
 **Problems:** what went wrong and how it was fixed, including anything the
-beginner-js-review skill flagged. Write "None" if nothing went wrong.
+beginner-code-review skill flagged. Write "None" if nothing went wrong.
 
 **Decisions:**
 - [Human] what I decided, and the reason I gave.
@@ -35,4 +35,4 @@ beginner-js-review skill flagged. Write "None" if nothing went wrong.
 
 ## When I ask who made the decisions
 
-Count the [Human] and [AI] items across the whole log and show both counts. Then list the three [Human] decisions that shaped the game most, one line each.
+Count the items and show three numbers: decisions made before any code (Step 0), [Human] decisions during the build, and [AI] decisions during the build. Then list the three [Human] decisions that shaped the game most, one line each.
