@@ -1,0 +1,192 @@
+/* styles.css: all styling for Bit Flip */
+
+/* Page basics: system fonts only, so nothing loads from the web */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: #1a1a2e;
+  background-color: #f7f7fb;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
+}
+
+/* Header */
+.site-header {
+  padding: 1.5rem;
+  text-align: center;
+  color: #ffffff;
+  background-color: #1a1a2e;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.tagline {
+  margin: 0.25rem 0 0;
+}
+
+/* Screens */
+.screen {
+  text-align: center;
+}
+
+/* Start screen choices */
+.choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.choice-button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 220px;
+  min-height: 96px;
+  padding: 1rem 1.25rem;
+  font: inherit;
+  color: #1a1a2e;
+  background-color: #ffffff;
+  border: 3px solid #1f5fbf;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.choice-button:hover {
+  background-color: #e8effa;
+}
+
+.choice-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.choice-detail {
+  font-size: 1rem;
+}
+
+/* Action buttons: Check, Next, Play again */
+.action-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.action-button {
+  min-width: 120px;
+  min-height: 56px;
+  padding: 0.75rem 1.5rem;
+  font: inherit;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #1f5fbf;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.action-button:hover {
+  background-color: #184b98;
+}
+
+/* Score bar */
+.score-bar {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+/* Cards: big enough to tap with a finger */
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  min-height: 140px;
+  font: inherit;
+  color: #1a1a2e;
+  background-color: #ffffff;
+  border: 3px solid #1a1a2e;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.card-on {
+  color: #ffffff;
+  background-color: #0b6e4f;
+  border-color: #0b6e4f;
+}
+
+.card-value {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.card-state {
+  font-size: 1rem;
+}
+
+/* Target and running total */
+.target {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.running-total {
+  font-size: 1.25rem;
+}
+
+/* Feedback messages */
+.feedback {
+  min-height: 1.5em;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.feedback-correct {
+  color: #0b5a41;
+  background-color: #e6f4ee;
+}
+
+.feedback-wrong {
+  color: #8a1c1c;
+  background-color: #fbeaea;
+}
+
+/* Focus styles: a thick dark ring for keyboard players */
+.choice-button:focus-visible,
+.action-button:focus-visible,
+.card:focus-visible {
+  outline: 4px solid #1a1a2e;
+  outline-offset: 4px;
+}
+
+/* Narrow screens: smaller cards so all five still fit in one row */
+@media (max-width: 700px) {
+  .card {
+    width: 88px;
+    min-height: 120px;
+  }
+
+  .choice-button {
+    min-width: 100%;
+  }
+}

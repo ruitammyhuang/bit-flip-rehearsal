@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bit Flip: Learn Binary Place Value</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Bit Flip</h1>
+    <p class="tagline">Flip the cards. Learn how computers count.</p>
+  </header>
+
+  <main>
+    <!-- Start screen: the player picks where to begin -->
+    <section id="start-screen" class="screen">
+      <h2>Where would you like to start?</h2>
+      <p>Pick the choice that sounds most like you. You can change levels at any time.</p>
+      <div class="choice-list">
+        <button type="button" id="start-new" class="choice-button">
+          <span class="choice-title">I'm new to binary</span>
+          <span class="choice-detail">Start with a short intro, then Level 1</span>
+        </button>
+        <button type="button" id="start-some" class="choice-button">
+          <span class="choice-title">I know a little</span>
+          <span class="choice-detail">Jump to Level 2</span>
+        </button>
+        <button type="button" id="start-challenge" class="choice-button">
+          <span class="choice-title">Challenge me</span>
+          <span class="choice-detail">Jump to Level 3</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Intro screen: short, hands-on lessons about binary -->
+    <section id="intro-screen" class="screen" hidden>
+      <h2>What is binary?</h2>
+      <p id="intro-text"></p>
+      <div id="intro-cards" class="card-row"></div>
+      <p id="intro-total" class="running-total"></p>
+      <button type="button" id="intro-next" class="action-button">Next</button>
+    </section>
+
+    <!-- Play screen: the levels -->
+    <section id="play-screen" class="screen" hidden>
+      <div class="score-bar">
+        <p>Score: <span id="score">0</span></p>
+        <p>Best streak: <span id="best-streak">0</span></p>
+      </div>
+      <h2 id="level-title">Level</h2>
+      <p id="target-text" class="target"></p>
+      <div id="play-cards" class="card-row"></div>
+      <p id="running-total" class="running-total"></p>
+      <p id="feedback" class="feedback" aria-live="polite"></p>
+      <div class="action-row">
+        <button type="button" id="check-button" class="action-button">Check</button>
+        <button type="button" id="next-button" class="action-button" hidden>Next</button>
+      </div>
+    </section>
+
+    <!-- End screen: points for each level -->
+    <section id="end-screen" class="screen" hidden>
+      <h2>You finished!</h2>
+      <p id="end-summary"></p>
+      <button type="button" id="play-again" class="action-button">Play again</button>
+    </section>
+  </main>
+
+  <script src="js/levels.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
