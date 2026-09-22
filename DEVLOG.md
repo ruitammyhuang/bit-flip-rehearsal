@@ -35,3 +35,14 @@
 - [AI] Cards show "On (1)" and "Off (0)", and the running line reads "Binary 01010 = 10", to link on and off to binary digits.
 - [AI] Chose the target numbers: Level 1 is 5, 2, 7, 0. Level 2 is 9, 16, 12, 21. Level 3 is 13, 31, 6, 26, 19.
 - [AI] Screens show and hide through a CSS class instead of the `hidden` attribute. "I'm new to binary" goes straight to Level 1 until the intro exists.
+
+## Step 3: Check, feedback, and Next
+
+**Built:** `js/game.js` now shows a target, checks answers, and gives feedback that gets stronger over three wrong tries, ending in a walkthrough of every card. Next moves on to the next round, level, or end screen. `css/styles.css` gained a blue help style.
+
+**Problems:** The "Correct! 16 = 16." and "1 is too big" (with 0 left) messages read badly, so I reworded them. The review failed one JSDoc first line that had two sentences, and I fixed it. `.focus()` was on neither list. `getSumText` and `showAnswer` are 19 lines each but do one job.
+
+**Decisions:**
+- [Human] Added `.focus()` to the allowed list. Reason: "This decision is fine and reasonable."
+- [AI] Wrote all the feedback wording. Level 3's second hint is "Tip: start with the biggest card that fits." instead of pointing to a card.
+- [AI] After three wrong tries, the game sets the cards to the answer and explains each one. Next takes focus after each round.

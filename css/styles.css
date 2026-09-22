@@ -180,6 +180,11 @@ main {
   background-color: #fbeaea;
 }
 
+.feedback-help {
+  color: #1a1a2e;
+  background-color: #e8effa;
+}
+
 /* Focus styles: a thick dark ring for keyboard players */
 .choice-button:focus-visible,
 .action-button:focus-visible,

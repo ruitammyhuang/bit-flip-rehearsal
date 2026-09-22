@@ -57,6 +57,7 @@ For every pair of text color and background color in the file, calculate the con
 - `innerText`, `classList.add`, `classList.remove`, `classList.toggle`, `classList.contains`
 - `setAttribute`, for ARIA attributes such as `aria-pressed`
 - `event.currentTarget`, to find which element was clicked
+- `.focus()`, to move keyboard focus when a button hides or a new round starts
 - String joining with `+`
 - `console.log`
 - `element.style.display` and other style properties
