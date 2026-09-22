@@ -46,3 +46,14 @@
 - [Human] Added `.focus()` to the allowed list. Reason: "This decision is fine and reasonable."
 - [AI] Wrote all the feedback wording. Level 3's second hint is "Tip: start with the biggest card that fits." instead of pointing to a card.
 - [AI] After three wrong tries, the game sets the cards to the answer and explains each one. Next takes focus after each round.
+
+## Step 4: Intro and guided Level 1
+
+**Built:** Three hands-on intro lessons (in `js/levels.js`) and Level 1's card-by-card "Is 4 too big?" flow with Yes/No buttons, both in `js/game.js`. Cards now show a big 1 or 0 with a small "worth 16" label, and the binary line is larger (`css/styles.css`).
+
+**Problems:** You found that the intro message stayed on screen after the cards changed. It now updates on every flip, and Next only shows while the goal is met. The review found no failures. `createCard` grew to 18 lines.
+
+**Decisions:**
+- [Human] Intro messages must follow the cards. Reason: "a learner might keep pressing the cards to play around, yet the hint message does not change."
+- [Human] Made the binary digit the biggest thing on each card. My version had the decimal value large and "On (1)" small. Reason: the goal is to learn binary, yet the decimal numbers were the eye-catching part.
+- [AI] Stored lessons as `{ text, bitValues, target, doneText }` instead of the planned `{ text, task }`. Labeled the answer buttons "Yes, too big" / "No, it fits". A wrong guided answer asks "Is 4 bigger than 5?" instead of giving the answer. Level 1 cards are locked because the game flips them.

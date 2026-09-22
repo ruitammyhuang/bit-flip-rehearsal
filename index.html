@@ -36,9 +36,11 @@
     <!-- Intro screen: short, hands-on lessons about binary -->
     <section id="intro-screen" class="screen">
       <h2>What is binary?</h2>
-      <p id="intro-text"></p>
+      <p id="intro-step" class="lesson-step"></p>
+      <p id="intro-text" class="lesson-text"></p>
       <div id="intro-cards" class="card-row"></div>
       <p id="intro-total" class="running-total"></p>
+      <p id="intro-feedback" class="feedback" aria-live="polite"></p>
       <button type="button" id="intro-next" class="action-button">Next</button>
     </section>
 
@@ -50,10 +52,13 @@
       </div>
       <h2 id="level-title">Level</h2>
       <p id="target-text" class="target"></p>
+      <p id="guided-question" class="guided-question" aria-live="polite"></p>
       <div id="play-cards" class="card-row"></div>
       <p id="running-total" class="running-total"></p>
       <p id="feedback" class="feedback" aria-live="polite"></p>
       <div class="action-row">
+        <button type="button" id="answer-too-big" class="action-button">Yes, too big</button>
+        <button type="button" id="answer-fits" class="action-button">No, it fits</button>
         <button type="button" id="check-button" class="action-button">Check</button>
         <button type="button" id="next-button" class="action-button">Next</button>
       </div>

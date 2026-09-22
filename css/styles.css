@@ -144,13 +144,25 @@ main {
   border-color: #0b6e4f;
 }
 
-.card-value {
-  font-size: 2rem;
-  font-weight: bold;
+/* Guided play: the card being asked about gets a blue ring */
+.card-current {
+  box-shadow: 0 0 0 5px #1f5fbf;
 }
 
-.card-state {
+/* Guided play: the game turns cards on, so they don't look pressable */
+.card-locked {
+  cursor: default;
+}
+
+/* Card labels: the binary digit is the biggest thing on the card, and the place value sits small above it */
+.card-place {
   font-size: 1rem;
+}
+
+.card-digit {
+  font-size: 3.5rem;
+  font-weight: bold;
+  line-height: 1.1;
 }
 
 /* Target and running total */
@@ -159,7 +171,27 @@ main {
   font-weight: bold;
 }
 
+/* A fixed-width font keeps the binary digits lined up and easy to read */
 .running-total {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 1.75rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+/* Guided question and intro lessons */
+.guided-question {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.lesson-step {
+  font-weight: bold;
+}
+
+.lesson-text {
+  max-width: 40rem;
+  margin: 0 auto;
   font-size: 1.25rem;
 }
 

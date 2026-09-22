@@ -8,6 +8,17 @@ const screenIds = ["start-screen", "intro-screen", "play-screen", "end-screen"];
 // After this many wrong tries, the game shows the answer and moves on
 const maxWrongTries = 3;
 
+// The screen the player is looking at
+let currentScreenId = "start-screen";
+
+// The row that holds the cards on screen, and the value of each card from left to right.
+// The intro and the levels each have their own row, but only one is on screen at a time.
+let cardRowId = "play-cards";
+let cardValues = [];
+
+// Position of the current lesson in the introLessons array from levels.js
+let lessonIndex = 0;
+
 // Position of the level being played in the levels array from levels.js
 let currentLevelIndex = 0;
 
@@ -16,6 +27,10 @@ let targetIndex = 0;
 
 // How many wrong answers the player has given for the current target
 let wrongTries = 0;
+
+// In guided play: which card the game is asking about, and how much is left to make
+let guidedCardIndex = 0;
+let stillNeed = 0;
 
 /**
  * Shows one screen and hides all the others.
@@ -27,6 +42,64 @@ function showScreen(screenId) {
     screen.classList.remove("screen-active");
   }
   document.getElementById(screenId).classList.add("screen-active");
+  currentScreenId = screenId;
+}
+
+/**
+ * Starts the intro from its first lesson.
+ */
+function startIntro() {
+  lessonIndex = 0;
+  showScreen("intro-screen");
+  showLesson();
+}
+
+/**
+ * Shows the current intro lesson and its cards.
+ */
+function showLesson() {
+  const lesson = introLessons[lessonIndex];
+  // Add 1 so players count lessons from 1, not 0
+  document.getElementById("intro-step").innerText = "Lesson " + (lessonIndex + 1) + " of " + introLessons.length;
+  document.getElementById("intro-text").innerText = lesson.text;
+  drawCards("intro-cards", lesson.bitValues);
+  document.getElementById("intro-total").innerText = getTotalText();
+  const introFeedback = document.getElementById("intro-feedback");
+  introFeedback.classList.remove("feedback-correct", "feedback-help");
+  introFeedback.innerText = "";
+  document.getElementById("intro-next").style.display = "none";
+  getCards()[0].focus();
+}
+
+/**
+ * Updates the intro total and message after every flip, and shows Next only while the target is met.
+ */
+function checkLesson() {
+  const lesson = introLessons[lessonIndex];
+  const introFeedback = document.getElementById("intro-feedback");
+  document.getElementById("intro-total").innerText = getTotalText();
+  introFeedback.classList.remove("feedback-correct", "feedback-help");
+  if (getSum() === lesson.target) {
+    introFeedback.classList.add("feedback-correct");
+    introFeedback.innerText = lesson.doneText;
+    document.getElementById("intro-next").style.display = "";
+  } else {
+    introFeedback.classList.add("feedback-help");
+    introFeedback.innerText = getSumText() + " The goal is " + lesson.target + ".";
+    document.getElementById("intro-next").style.display = "none";
+  }
+}
+
+/**
+ * Moves to the next intro lesson, or to Level 1 after the last lesson.
+ */
+function goToNextLesson() {
+  lessonIndex = lessonIndex + 1;
+  if (lessonIndex < introLessons.length) {
+    showLesson();
+  } else {
+    startLevel(0);
+  }
 }
 
 /**
@@ -47,13 +120,53 @@ function startLevel(levelIndex) {
 function startRound() {
   wrongTries = 0;
   document.getElementById("target-text").innerText = "Make the number " + getTarget();
-  drawCards(levels[currentLevelIndex].bitValues);
+  drawCards("play-cards", levels[currentLevelIndex].bitValues);
   updateTotal();
   showFeedback("", "");
-  document.getElementById("check-button").style.display = "";
   document.getElementById("next-button").style.display = "none";
+  if (levels[currentLevelIndex].guided) {
+    startGuidedRound();
+  } else {
+    startFreeRound();
+  }
+}
+
+/**
+ * Sets up a round where the player flips cards freely and presses Check.
+ */
+function startFreeRound() {
+  document.getElementById("guided-question").innerText = "";
+  showGuidedButtons(false);
+  document.getElementById("check-button").style.display = "";
   // Put focus on the first card so keyboard players can start right away
   getCards()[0].focus();
+}
+
+/**
+ * Sets up a round where the game asks about one card at a time.
+ */
+function startGuidedRound() {
+  guidedCardIndex = 0;
+  stillNeed = getTarget();
+  document.getElementById("check-button").style.display = "none";
+  showGuidedButtons(true);
+  lockCards();
+  askGuidedQuestion();
+  // Put focus on the first answer button so keyboard players can answer right away
+  document.getElementById("answer-too-big").focus();
+}
+
+/**
+ * Shows or hides the two answer buttons used in guided play.
+ * @param {boolean} show - True to show the buttons, false to hide them.
+ */
+function showGuidedButtons(show) {
+  let display = "none";
+  if (show) {
+    display = "";
+  }
+  document.getElementById("answer-too-big").style.display = display;
+  document.getElementById("answer-fits").style.display = display;
 }
 
 /**
@@ -65,19 +178,22 @@ function getTarget() {
 }
 
 /**
- * Gets the card buttons on the play screen, from left to right.
+ * Gets the card buttons on screen, from left to right.
  * @returns {Array} The card buttons.
  */
 function getCards() {
-  return document.getElementById("play-cards").children;
+  return document.getElementById(cardRowId).children;
 }
 
 /**
- * Removes the old cards and draws one new card for each bit value.
+ * Removes the old cards from a row and draws one new card for each bit value.
+ * @param {string} rowId - The id of the row to draw the cards in.
  * @param {Array} bitValues - The value of each card, from left to right.
  */
-function drawCards(bitValues) {
-  const cardRow = document.getElementById("play-cards");
+function drawCards(rowId, bitValues) {
+  cardRowId = rowId;
+  cardValues = bitValues;
+  const cardRow = document.getElementById(rowId);
   while (cardRow.children.length > 0) {
     cardRow.removeChild(cardRow.children[0]);
   }
@@ -95,18 +211,33 @@ function createCard(bitValue) {
   const card = document.createElement("button");
   card.classList.add("card");
 
-  const valueLabel = document.createElement("span");
-  valueLabel.classList.add("card-value");
-  valueLabel.innerText = bitValue;
-  card.appendChild(valueLabel);
+  // Screen readers say "Card worth 16" and then whether it is pressed (on) or not
+  card.setAttribute("aria-label", "Card worth " + bitValue);
 
-  const stateLabel = document.createElement("span");
-  stateLabel.classList.add("card-state");
-  card.appendChild(stateLabel);
+  const placeLabel = document.createElement("span");
+  placeLabel.classList.add("card-place");
+  placeLabel.innerText = "worth " + bitValue;
+  card.appendChild(placeLabel);
+
+  const digitLabel = document.createElement("span");
+  digitLabel.classList.add("card-digit");
+  card.appendChild(digitLabel);
 
   setCard(card, false);
   card.addEventListener("click", flipCard);
   return card;
+}
+
+/**
+ * Locks every card so pressing it does nothing, for guided play.
+ */
+function lockCards() {
+  const cards = getCards();
+  for (let i = 0; i < cards.length; i++) {
+    cards[i].classList.add("card-locked");
+    // aria-disabled tells screen readers the card can't be pressed right now
+    cards[i].setAttribute("aria-disabled", "true");
+  }
 }
 
 /**
@@ -115,16 +246,16 @@ function createCard(bitValue) {
  * @param {boolean} turnOn - True to turn the card on, false to turn it off.
  */
 function setCard(card, turnOn) {
-  // The second span inside the card shows the on or off label
-  const stateLabel = card.children[1];
+  // The second span inside the card shows the binary digit, 1 for on and 0 for off
+  const digitLabel = card.children[1];
   if (turnOn) {
     card.classList.add("card-on");
-    stateLabel.innerText = "On (1)";
+    digitLabel.innerText = "1";
     // aria-pressed tells screen readers whether the card is on or off
     card.setAttribute("aria-pressed", "true");
   } else {
     card.classList.remove("card-on");
-    stateLabel.innerText = "Off (0)";
+    digitLabel.innerText = "0";
     card.setAttribute("aria-pressed", "false");
   }
 }
@@ -139,13 +270,21 @@ function isCardOn(card) {
 }
 
 /**
- * Flips the clicked card and updates the running total.
+ * Flips the pressed card, then updates the intro or the running total.
  * @param {Object} event - The click event. Space and Enter on a button also send a click.
  */
 function flipCard(event) {
   const card = event.currentTarget;
+  // In guided play the game turns cards on itself, so pressing a locked card does nothing
+  if (card.classList.contains("card-locked")) {
+    return;
+  }
   setCard(card, !isCardOn(card));
-  updateTotal();
+  if (currentScreenId === "intro-screen") {
+    checkLesson();
+  } else {
+    updateTotal();
+  }
 }
 
 /**
@@ -154,11 +293,10 @@ function flipCard(event) {
  */
 function getSum() {
   const cards = getCards();
-  const bitValues = levels[currentLevelIndex].bitValues;
   let sum = 0;
   for (let i = 0; i < cards.length; i++) {
     if (isCardOn(cards[i])) {
-      sum = sum + bitValues[i];
+      sum = sum + cardValues[i];
     }
   }
   return sum;
@@ -187,14 +325,13 @@ function getBinaryText() {
  */
 function getSumText() {
   const cards = getCards();
-  const bitValues = levels[currentLevelIndex].bitValues;
   let sumText = "";
   let cardsOn = 0;
   // No plus sign before the first number, then a plus sign before each one after it
   let separator = "";
   for (let i = 0; i < cards.length; i++) {
     if (isCardOn(cards[i])) {
-      sumText = sumText + separator + bitValues[i];
+      sumText = sumText + separator + cardValues[i];
       separator = " + ";
       cardsOn = cardsOn + 1;
     }
@@ -208,12 +345,20 @@ function getSumText() {
 }
 
 /**
+ * Writes the binary digits and their total, such as "Binary 01010 = 10".
+ * @returns {string} The binary digits and the total.
+ */
+function getTotalText() {
+  return "Binary " + getBinaryText() + " = " + getSum();
+}
+
+/**
  * Shows the binary digits and their total, or hides them if the level turns the total off.
  */
 function updateTotal() {
   const totalText = document.getElementById("running-total");
   if (levels[currentLevelIndex].showTotal) {
-    totalText.innerText = "Binary " + getBinaryText() + " = " + getSum();
+    totalText.innerText = getTotalText();
   } else {
     totalText.innerText = "";
   }
@@ -231,6 +376,84 @@ function showFeedback(message, feedbackClass) {
     feedback.classList.add(feedbackClass);
   }
   feedback.innerText = message;
+}
+
+/**
+ * Asks whether the current card is too big for what is still needed, and rings that card.
+ */
+function askGuidedQuestion() {
+  const cards = getCards();
+  const bitValue = cardValues[guidedCardIndex];
+  for (let i = 0; i < cards.length; i++) {
+    cards[i].classList.remove("card-current");
+  }
+  cards[guidedCardIndex].classList.add("card-current");
+  document.getElementById("guided-question").innerText = "You still need " + stillNeed + ". The " + bitValue + " card is worth " + bitValue + ". Is " + bitValue + " too big?";
+}
+
+/**
+ * Checks the player's answer to the guided question and moves to the next card if it's right.
+ * @param {boolean} saysTooBig - True if the player answered "Yes, too big".
+ */
+function answerGuided(saysTooBig) {
+  const bitValue = cardValues[guidedCardIndex];
+  const isTooBig = bitValue > stillNeed;
+  if (saysTooBig !== isTooBig) {
+    showFeedback("Not quite. Is " + bitValue + " bigger than " + stillNeed + "? If it is, it's too big. If not, it fits.", "feedback-wrong");
+    return;
+  }
+  const stepText = applyGuidedAnswer(bitValue, isTooBig);
+  guidedCardIndex = guidedCardIndex + 1;
+  if (guidedCardIndex < cardValues.length) {
+    showFeedback(stepText, "feedback-correct");
+    askGuidedQuestion();
+  } else {
+    finishGuidedRound(stepText);
+  }
+}
+
+/**
+ * Turns the current card on if it fits, and explains what happened.
+ * @param {number} bitValue - The value of the current card.
+ * @param {boolean} isTooBig - True if the card is bigger than what is still needed.
+ * @returns {string} A sentence explaining why the card is on or off.
+ */
+function applyGuidedAnswer(bitValue, isTooBig) {
+  if (isTooBig) {
+    return "Right. " + bitValue + " is bigger than " + stillNeed + ", so the " + bitValue + " card stays off.";
+  }
+  stillNeed = stillNeed - bitValue;
+  setCard(getCards()[guidedCardIndex], true);
+  updateTotal();
+  return "Right. " + bitValue + " fits, so the " + bitValue + " card turns on. You still need " + stillNeed + ".";
+}
+
+/**
+ * Ends a guided round by showing the finished number in binary.
+ * @param {string} stepText - The explanation for the last card.
+ */
+function finishGuidedRound(stepText) {
+  const cards = getCards();
+  // The last card is always the one being asked about when the round ends
+  cards[cards.length - 1].classList.remove("card-current");
+  document.getElementById("guided-question").innerText = "";
+  showGuidedButtons(false);
+  showFeedback(stepText + "\nDone! " + getSumText() + " In binary, " + getTarget() + " is " + getBinaryText() + ".", "feedback-correct");
+  endRound();
+}
+
+/**
+ * Answers "Yes, too big" to the guided question.
+ */
+function answerTooBig() {
+  answerGuided(true);
+}
+
+/**
+ * Answers "No, it fits" to the guided question.
+ */
+function answerFits() {
+  answerGuided(false);
 }
 
 /**
@@ -284,15 +507,14 @@ function getDirectionText(sum) {
  */
 function getCardHint() {
   const cards = getCards();
-  const bitValues = levels[currentLevelIndex].bitValues;
-  let stillNeed = getTarget();
+  let stillNeedHere = getTarget();
   for (let i = 0; i < cards.length; i++) {
-    const shouldBeOn = bitValues[i] <= stillNeed;
+    const shouldBeOn = cardValues[i] <= stillNeedHere;
     if (shouldBeOn !== isCardOn(cards[i])) {
-      return "Not yet. Look at the " + bitValues[i] + " card. You still need " + stillNeed + ". Is " + bitValues[i] + " too big?";
+      return "Not yet. Look at the " + cardValues[i] + " card. You still need " + stillNeedHere + ". Is " + cardValues[i] + " too big?";
     }
     if (shouldBeOn) {
-      stillNeed = stillNeed - bitValues[i];
+      stillNeedHere = stillNeedHere - cardValues[i];
     }
   }
   return "Not yet. Check each card again.";
@@ -303,20 +525,19 @@ function getCardHint() {
  */
 function showAnswer() {
   const cards = getCards();
-  const bitValues = levels[currentLevelIndex].bitValues;
-  let stillNeed = getTarget();
+  let stillNeedHere = getTarget();
   let explanation = "Here's how to make " + getTarget() + ", starting with the biggest card:";
   for (let i = 0; i < cards.length; i++) {
-    if (bitValues[i] <= stillNeed) {
-      stillNeed = stillNeed - bitValues[i];
+    if (cardValues[i] <= stillNeedHere) {
+      stillNeedHere = stillNeedHere - cardValues[i];
       setCard(cards[i], true);
-      explanation = explanation + "\n" + bitValues[i] + " fits, so it's on. You still need " + stillNeed + ".";
-    } else if (stillNeed === 0) {
+      explanation = explanation + "\n" + cardValues[i] + " fits, so it's on. You still need " + stillNeedHere + ".";
+    } else if (stillNeedHere === 0) {
       setCard(cards[i], false);
-      explanation = explanation + "\n" + "Nothing is left to make, so " + bitValues[i] + " is off.";
+      explanation = explanation + "\n" + "Nothing is left to make, so " + cardValues[i] + " is off.";
     } else {
       setCard(cards[i], false);
-      explanation = explanation + "\n" + bitValues[i] + " is too big, so it's off.";
+      explanation = explanation + "\n" + cardValues[i] + " is too big, so it's off.";
     }
   }
   updateTotal();
@@ -330,7 +551,7 @@ function endRound() {
   document.getElementById("check-button").style.display = "none";
   const nextButton = document.getElementById("next-button");
   nextButton.style.display = "";
-  // Move focus to Next, because the Check button the player just pressed is now hidden
+  // Move focus to Next, because the button the player just pressed is now hidden
   nextButton.focus();
 }
 
@@ -349,11 +570,10 @@ function goToNext() {
 }
 
 /**
- * Starts the game for a player who is new to binary.
+ * Starts the game with the intro, for a player who is new to binary.
  */
 function startNew() {
-  // The intro comes before Level 1 in a later step. For now this goes straight to Level 1.
-  startLevel(0);
+  startIntro();
 }
 
 /**
@@ -373,5 +593,8 @@ function startChallenge() {
 document.getElementById("start-new").addEventListener("click", startNew);
 document.getElementById("start-some").addEventListener("click", startSome);
 document.getElementById("start-challenge").addEventListener("click", startChallenge);
+document.getElementById("intro-next").addEventListener("click", goToNextLesson);
+document.getElementById("answer-too-big").addEventListener("click", answerTooBig);
+document.getElementById("answer-fits").addEventListener("click", answerFits);
 document.getElementById("check-button").addEventListener("click", checkAnswer);
 document.getElementById("next-button").addEventListener("click", goToNext);
