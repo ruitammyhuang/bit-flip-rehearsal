@@ -13,11 +13,13 @@ Every level gives points: 3 for a first try, 2 for a second, and 1 for a third. 
 
 **Changing the content.** Levels, target numbers, and intro lessons live in `js/levels.js`. Changing target numbers, lesson text, or level settings never requires editing `js/game.js`.
 
-**How to run it.** Double-click `index.html`. It opens in any modern browser, needs no internet connection or server, and can be played with only a keyboard.
+**How to run it.** Double-click `index.html`. It opens in any modern browser and needs no internet connection or server. Every action works with the keyboard alone, a mouse, or a tap, and nothing needs a hover or a drag.
 
 ---
 
 # Bit Flip starter package
+
+> **Note:** This section describes the starting package, before the game was built. In this repo, Step 1 is already done: the skills live in `.claude/skills/` and `.codex/skills/`. The build history is in the commits and in `DEVLOG.md`.
 
 This is the starting point from the Live 3 session: the project brief and two skills, and no game code. The game gets built from here, with an AI, in front of you.
 
